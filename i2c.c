@@ -107,7 +107,7 @@ int i2c_read(u8 slave_addr, u8 reg, u8 *result) {
 int main(int argc, char** argv) {
 	i2c_init();
 	while(1) {
-		i2c_write(0x03, 0, 100, 13);
+		i2c_write(0x42, 0, 100, 13);
 	}
 	return 0;
 }
