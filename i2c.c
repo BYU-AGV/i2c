@@ -42,6 +42,8 @@ void i2c_close(void) {
 
 // Write to an I2C slave device's register:
 int i2c_write(u8 slave_addr, u8 reg, u8 data1, u8 data2) {
+    printf("Writing %d, %d\n", data1, data2);
+
     int retval;
     u8 outbuf[3];
 
