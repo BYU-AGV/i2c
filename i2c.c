@@ -122,18 +122,25 @@ int32_t i2c_write_msg_set(struct i2c_rdwr_ioctl_data* msgset) {
 }
 
 int i2c_send_msg(uint16_t address, uint16_t data_length, uint8_t* buffer) {
-    struct i2c_msg msg;
-    struct i2c_rdwr_ioctl_data msgset;
+    struct i2c_msg msg[1];
+    struct i2c_rdwr_ioctl_data msgset[1];
 
-    msg.addr = address;
-    msg.flags = 0;
-    msg.len = data_length;
-    msg.buf = buffer;
+    msg[0].addr = address;
+    msg[0].flags = 0;
+    msg[0].len = data_length;
+    msg[0].buf = buffer;
 
-    msgset.msgs = &msg;
-    msgset.nmsgs = 1;
+    msgset[0].msgs = msg;
+    msgset[0].nmsgs = 1;
 
-    return i2c_write_msg_set(&msgset);
+    if (ioctl(i2c_fd, I2C_RDWR, &msgset)) {
+        perror("iotcl(I2C_RDWR) failed to send message set");
+        return -1;
+    }
+
+    return 0;
+
+    // return i2c_write_msg_set(&msgset);
 }
 
 int i2c_send_motor_control_message(uint16_t address, int32_t linear_velocity, int32_t angular_velocity) {
@@ -155,7 +162,25 @@ int i2c_send_motor_control_message(uint16_t address, int32_t linear_velocity, in
     data_buffer[7] = ang_buff.buffer[2];
     data_buffer[8] = ang_buff.buffer[3];
 
-    return i2c_send_msg(address, 9, data_buffer);
+    struct i2c_msg msg[1];
+    struct i2c_rdwr_ioctl_data msgset[1];
+
+    msg[0].addr = address;
+    msg[0].flags = 0;
+    msg[0].len = 9;
+    msg[0].buf = data_buffer;
+
+    msgset[0].msgs = msg;
+    msgset[0].nmsgs = 1;
+
+    if (ioctl(i2c_fd, I2C_RDWR, &msgset)) {
+        perror("iotcl(I2C_RDWR) failed to send message set");
+        return -1;
+    }
+
+    return 0;
+
+    // return i2c_send_msg(address, 9, data_buffer);
 }
 
 void i2c_clear_msg(struct i2c_msg* msg) { free(msg); }
