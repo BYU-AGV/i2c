@@ -96,10 +96,10 @@ int i2c_write(u8 slave_addr, u8 reg, u8 data1, u8 data2, u8 data3, u8 data4, u8 
     outbuf[2] = data2;
     outbuf[3] = data3;
     outbuf[4] = data4;
-    outbuf[1] = data5;
-    outbuf[2] = data6;
-    outbuf[3] = data7;
-    outbuf[4] = data8;
+    outbuf[5] = data5;
+    outbuf[6] = data6;
+    outbuf[7] = data7;
+    outbuf[8] = data8;
 
     msgs[0].addr = slave_addr;
     msgs[0].flags = 0;
