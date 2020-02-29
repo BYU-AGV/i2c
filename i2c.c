@@ -129,7 +129,7 @@ int i2c_send_motor_control_message(uint16_t address, int32_t linear_velocity, in
     msgset[0].nmsgs = 1;
 
     if (ioctl(i2c_fd, I2C_RDWR, &msgset) < 0) {
-        perror("ioctl(I2C_RDWR) in i2c_write");
+        perror("ioctl(I2C_RDWR) in i2c_send_motor_control_message");
         return -1;
     }
 
