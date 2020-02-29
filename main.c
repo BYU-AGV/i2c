@@ -104,8 +104,51 @@ size_t get_axis_state(struct js_event *event, struct axis_state axes[3])
     return axis;
 }
 
-int main(int argc, char *argv[])
-{
+// int main(int argc, char *argv[])
+// {
+//     const char *device;
+//     int js;
+//     struct js_event event;
+//     struct axis_state axes[3] = {0};
+//     size_t axis;
+
+//     if (argc > 1)
+//         device = argv[1];
+//     else
+//         device = "/dev/input/js0";
+
+//     js = open(device, O_RDONLY);
+
+//     if (js == -1)
+//         perror("Could not open joystick");
+
+//     /* This loop will exit if the controller is unplugged. */
+//     while (read_event(js, &event) == 0)
+//     {
+//         switch (event.type)
+//         {
+//             case JS_EVENT_BUTTON:
+//                 printf("Button %u %s\n", event.number, event.value ? "pressed" : "released");
+//                 break;
+//             case JS_EVENT_AXIS:
+//                 axis = get_axis_state(&event, axes);
+//                 if (axis < 3)
+//                     printf("Axis %zu at (%6d, %6d)\n", axis, axes[axis].x, axes[axis].y);
+//                 break;
+//             default:
+//                 /* Ignore init events. */
+//                 break;
+//         }
+        
+//         fflush(stdout);
+//     }
+
+//     close(js);
+//     return 0;
+// }
+
+int main(int argc, char** argv) {
+    
     const char *device;
     int js;
     struct js_event event;
@@ -122,6 +165,7 @@ int main(int argc, char *argv[])
     if (js == -1)
         perror("Could not open joystick");
 
+    i2c_init();
     /* This loop will exit if the controller is unplugged. */
     while (read_event(js, &event) == 0)
     {
@@ -134,6 +178,7 @@ int main(int argc, char *argv[])
                 axis = get_axis_state(&event, axes);
                 if (axis < 3)
                     printf("Axis %zu at (%6d, %6d)\n", axis, axes[axis].x, axes[axis].y);
+                    i2c_send_motor_control_message(SLAVE_ADDR, axes[axis].x, axes[axis].y);
                 break;
             default:
                 /* Ignore init events. */
@@ -146,28 +191,3 @@ int main(int argc, char *argv[])
     close(js);
     return 0;
 }
-
-// int main(int argc, char** argv) {
-    // Joystick joystick("/dev/input/js0");
-
-    // Ensure that it was found and that we can use it
-    // if (!joystick.isFound())
-    // {
-        // printf("open failed.\n");
-        // exit(1);
-    // }
-
-    // i2c_init();
-    // while (1) {
-    //     // i2c_write(0x42, 0, 100, 13);
-    //     i2c_send_motor_control_message(SLAVE_ADDR, 130, -10);
-    //     // int32_buffer lin_buff;
-    //     // lin_buff.value = 100;
-
-    //     // int32_buffer ang_buff;
-    //     // ang_buff.value = -100;
-
-    //     // i2c_write(0x42, 0, lin_buff.buffer[0], lin_buff.buffer[1], lin_buff.buffer[2], lin_buff.buffer[3], ang_buff.buffer[0], ang_buff.buffer[1], ang_buff.buffer[2], ang_buff.buffer[3]);
-    // }
-    // return 0;
-// }
