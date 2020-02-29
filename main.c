@@ -178,7 +178,7 @@ int main(int argc, char** argv) {
                 axis = get_axis_state(&event, axes);
                 if (axis < 3)
                     printf("Axis %zu at (%6d, %6d)\n", axis, axes[axis].x, axes[axis].y);
-                    i2c_send_motor_control_message(SLAVE_ADDR, axes[axis].x, axes[axis].y);
+                    i2c_send_motor_control_message(SLAVE_ADDR, axes[axis].y, 0);
                 break;
             default:
                 /* Ignore init events. */
