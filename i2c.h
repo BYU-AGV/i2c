@@ -12,7 +12,7 @@
 #include <linux/i2c.h>
 #endif
 
-#define SLAVE_ADDR 0x35
+#define SLAVE_ADDR 35
 
 typedef unsigned char u8;
 
