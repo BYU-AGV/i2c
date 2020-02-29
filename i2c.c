@@ -150,7 +150,8 @@ int i2c_send_msg(uint16_t address, uint16_t data_length, uint8_t* buffer) {
 }
 
 int i2c_send_motor_control_message(uint16_t address, int32_t linear_velocity, int32_t angular_velocity) {
-    uint8_t data_buffer[9];
+    int retval;
+    u8 outbuf[9];
 
     int32_buffer lin_buff;
     lin_buff.value = linear_velocity;
@@ -158,29 +159,29 @@ int i2c_send_motor_control_message(uint16_t address, int32_t linear_velocity, in
     int32_buffer ang_buff;
     ang_buff.value = angular_velocity;
 
-    data_buffer[0] = MOTOR_CONTROL_MSG;
-    data_buffer[1] = lin_buff.buffer[0];
-    data_buffer[2] = lin_buff.buffer[1];
-    data_buffer[3] = lin_buff.buffer[2];
-    data_buffer[4] = lin_buff.buffer[3];
-    data_buffer[5] = ang_buff.buffer[0];
-    data_buffer[6] = ang_buff.buffer[1];
-    data_buffer[7] = ang_buff.buffer[2];
-    data_buffer[8] = ang_buff.buffer[3];
-
-    struct i2c_msg msg[1];
+    struct i2c_msg msgs[1];
     struct i2c_rdwr_ioctl_data msgset[1];
 
-    msg[0].addr = address;
-    msg[0].flags = 0;
-    msg[0].len = 9;
-    msg[0].buf = data_buffer;
+    outbuf[0] = 0;
+    outbuf[1] = lin_buff.buffer[0];
+    outbuf[2] = lin_buff.buffer[1];
+    outbuf[3] = lin_buff.buffer[2];
+    outbuf[4] = lin_buff.buffer[3];
+    outbuf[5] = ang_buff.buffer[0];
+    outbuf[6] = ang_buff.buffer[1];
+    outbuf[7] = ang_buff.buffer[2];
+    outbuf[8] = ang_buff.buffer[3];
 
-    msgset[0].msgs = msg;
+    msgs[0].addr = address;
+    msgs[0].flags = 0;
+    msgs[0].len = 10;
+    msgs[0].buf = outbuf;
+
+    msgset[0].msgs = msgs;
     msgset[0].nmsgs = 1;
 
-    if (ioctl(i2c_fd, I2C_RDWR, &msgset)) {
-        perror("iotcl(I2C_RDWR) failed to send message set");
+    if (ioctl(i2c_fd, I2C_RDWR, &msgset) < 0) {
+        perror("ioctl(I2C_RDWR) in i2c_write");
         return -1;
     }
 
@@ -232,14 +233,14 @@ int main(int argc, char** argv) {
     i2c_init();
     while (1) {
         // i2c_write(0x42, 0, 100, 13);
-        // i2c_send_motor_control_message(SLAVE_ADDR, 100, -110);
-        int32_buffer lin_buff;
-        lin_buff.value = 100;
+        i2c_send_motor_control_message(SLAVE_ADDR, 100, -110);
+        // int32_buffer lin_buff;
+        // lin_buff.value = 100;
 
-        int32_buffer ang_buff;
-        ang_buff.value = -100;
+        // int32_buffer ang_buff;
+        // ang_buff.value = -100;
 
-        i2c_write(0x42, 0, lin_buff.buffer[0], lin_buff.buffer[1], lin_buff.buffer[2], lin_buff.buffer[3], ang_buff.buffer[0], ang_buff.buffer[1], ang_buff.buffer[2], ang_buff.buffer[3]);
+        // i2c_write(0x42, 0, lin_buff.buffer[0], lin_buff.buffer[1], lin_buff.buffer[2], lin_buff.buffer[3], ang_buff.buffer[0], ang_buff.buffer[1], ang_buff.buffer[2], ang_buff.buffer[3]);
     }
     return 0;
 }
