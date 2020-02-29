@@ -11,6 +11,8 @@
 #include <linux/i2c.h>
 #endif
 
+#include "joystick.hh"
+
 #define SLAVE_ADDR 0x42
 
 typedef unsigned char u8;
@@ -230,6 +232,15 @@ int i2c_read(u8 slave_addr, u8 reg, u8* result) {
 }
 
 int main(int argc, char** argv) {
+    Joystick joystick("/dev/input/js0");
+
+    // Ensure that it was found and that we can use it
+    if (!joystick.isFound())
+    {
+        printf("open failed.\n");
+        exit(1);
+    }
+
     i2c_init();
     while (1) {
         // i2c_write(0x42, 0, 100, 13);
