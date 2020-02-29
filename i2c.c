@@ -84,9 +84,9 @@ int i2c_init(void) {
 void i2c_close(void) { close(i2c_fd); }
 
 // Write to an I2C slave device's register:
-int i2c_write(u8 slave_addr, u8 reg, u8 data1, u8 data2, u8 data3, u8 data4) {
+int i2c_write(u8 slave_addr, u8 reg, u8 data1, u8 data2, u8 data3, u8 data4, u8 data5, u8 data6, u8 data7, u8 data8) {
     int retval;
-    u8 outbuf[5];
+    u8 outbuf[9];
 
     struct i2c_msg msgs[1];
     struct i2c_rdwr_ioctl_data msgset[1];
@@ -96,10 +96,14 @@ int i2c_write(u8 slave_addr, u8 reg, u8 data1, u8 data2, u8 data3, u8 data4) {
     outbuf[2] = data2;
     outbuf[3] = data3;
     outbuf[4] = data4;
+    outbuf[1] = data5;
+    outbuf[2] = data6;
+    outbuf[3] = data7;
+    outbuf[4] = data8;
 
     msgs[0].addr = slave_addr;
     msgs[0].flags = 0;
-    msgs[0].len = 6;
+    msgs[0].len = 10;
     msgs[0].buf = outbuf;
 
     msgset[0].msgs = msgs;
@@ -231,7 +235,11 @@ int main(int argc, char** argv) {
         // i2c_send_motor_control_message(SLAVE_ADDR, 100, -110);
         int32_buffer lin_buff;
         lin_buff.value = 100;
-        i2c_write(0x42, 0, lin_buff.buffer[0], lin_buff.buffer[1], lin_buff.buffer[2], lin_buff.buffer[3]);
+
+        int32_buffer ang_buff;
+        ang_buff.value = -100;
+
+        i2c_write(0x42, 0, lin_buff.buffer[0], lin_buff.buffer[1], lin_buff.buffer[2], lin_buff.buffer[3], ang_buff.buffer[0], ang_buff.buffer[1], ang_buff.buffer[2], ang_buff.buffer[3]);
     }
     return 0;
 }
