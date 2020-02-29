@@ -1,58 +1,4 @@
-#include <fcntl.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include <linux/i2c-dev.h>
-// Terrible portability hack between arm-linux-gnueabihf-gcc on Mac OS X and
-// native gcc on raspbian.
-#ifndef I2C_M_RD
-#include <linux/i2c.h>
-#endif
-
-#include "joystick.hh"
-
-#define SLAVE_ADDR 0x42
-
-typedef unsigned char u8;
-
-typedef enum { MOTOR_CONTROL_MSG } MSG_TYPE;
-
-typedef struct i2c_sample_data {
-    uint8_t linear_velocity;
-    uint8_t angular_velocity;
-} i2c_sample_data;
-
-typedef union uint16_buffer {
-    uint16_t value;
-    uint8_t buffer[2];
-} uint16_buffer;
-
-typedef union uint32_buffer {
-    uint32_t value;
-    uint8_t buffer[4];
-} uint32_buffer;
-
-typedef union uint64_buffer {
-    uint64_t value;
-    uint8_t buffer[8];
-} uint64_buffer;
-
-typedef union int16_buffer {
-    int16_t value;
-    uint8_t buffer[2];
-} int16_buffer;
-
-typedef union int32_buffer {
-    int32_t value;
-    uint8_t buffer[4];
-} int32_buffer;
-
-typedef union int64_buffer {
-    int64_t value;
-    uint8_t buffer[8];
-} int64_buffer;
+#include "i2c.h"
 
 // Global file descriptor used to talk to the I2C bus:
 int i2c_fd = -1;
@@ -71,7 +17,7 @@ int i2c_init(void) {
         printf("Opened i2c port\n");
     }
 
-    // NOTE we do not call ioctl with I2C_SLAVE here because we always use the
+    // NOTE we do not call ioctl with I2C_SLAVE hi2c_fdere because we always use the
     // I2C_RDWR ioctl operation to do writes, reads, and combined write-reads.
     // I2C_SLAVE would be used to set the I2C slave address to communicate with.
     // With I2C_RDWR operation, you specify the slave address every time. There
@@ -228,30 +174,5 @@ int i2c_read(u8 slave_addr, u8 reg, u8* result) {
     }
 
     *result = inbuf[0];
-    return 0;
-}
-
-int main(int argc, char** argv) {
-    Joystick joystick("/dev/input/js0");
-
-    // Ensure that it was found and that we can use it
-    if (!joystick.isFound())
-    {
-        printf("open failed.\n");
-        exit(1);
-    }
-
-    i2c_init();
-    while (1) {
-        // i2c_write(0x42, 0, 100, 13);
-        i2c_send_motor_control_message(SLAVE_ADDR, 130, -10);
-        // int32_buffer lin_buff;
-        // lin_buff.value = 100;
-
-        // int32_buffer ang_buff;
-        // ang_buff.value = -100;
-
-        // i2c_write(0x42, 0, lin_buff.buffer[0], lin_buff.buffer[1], lin_buff.buffer[2], lin_buff.buffer[3], ang_buff.buffer[0], ang_buff.buffer[1], ang_buff.buffer[2], ang_buff.buffer[3]);
-    }
     return 0;
 }
