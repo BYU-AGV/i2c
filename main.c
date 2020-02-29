@@ -167,6 +167,7 @@ int main(int argc, char** argv) {
 
     i2c_init();
     /* This loop will exit if the controller is unplugged. */
+    i2c_send_motor_control_message(SLAVE_ADDR, 0, 0);
     while (read_event(js, &event) == 0)
     {
         switch (event.type)
