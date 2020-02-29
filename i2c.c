@@ -226,7 +226,8 @@ int main(int argc, char** argv) {
     i2c_init();
     while (1) {
         // i2c_write(0x42, 0, 100, 13);
-        i2c_send_motor_control_message(SLAVE_ADDR, 100, -110);
+        // i2c_send_motor_control_message(SLAVE_ADDR, 100, -110);
+        i2c_write(0x42, 0, 1, 1);
     }
     return 0;
 }
