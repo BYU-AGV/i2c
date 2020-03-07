@@ -178,8 +178,8 @@ int main(int argc, char** argv) {
             case JS_EVENT_AXIS:
                 axis = get_axis_state(&event, axes);
                 if (axis < 3)
-                    printf("Axis %zu at (%6d, %6d)\n", axis, axes[axis].x, axes[axis].y);
-                    i2c_send_motor_control_message(SLAVE_ADDR, axes[axis].y, 0);
+                    printf("Axis %zu at (%6d, %6d)\n", axis, axes[axis].y, axes[axis].x);
+                    i2c_send_motor_control_message(SLAVE_ADDR, axes[axis].y, axes[axis].x);
                 break;
             default:
                 /* Ignore init events. */
